@@ -92,7 +92,7 @@ CIN7_CUSTOMER_APPS_LINK = "767392"  # Your Cin7 customer apps link ID
 # Fields to request from Sales Orders
 # Note: DistributionBranchId/DistributionBranch kept for reference but no longer used for filtering
 SALES_ORDER_FIELDS = [
-    "Id", "Reference", "ProjectName", "Company",
+    "Id", "Reference", "ProjectName", "Company", "ContactFirstName",
     "CreatedDate", "ModifiedDate",
     "Stage", "Status", "BranchId",
     "EstimatedDeliveryDate", "DispatchedDate",
@@ -1481,6 +1481,7 @@ def process_orders_dataframe(orders: List[Dict]) -> pd.DataFrame:
             "Reference": get_field("Reference") or "",
             "ProjectName": get_field("ProjectName") or "",
             "Company": get_field("Company") or "",
+            "ContactFirstName": get_field("ContactFirstName") or "",
             "CreatedDate": created_date,
             "ModifiedDate": modified_date,
             "Stage": stage,
@@ -1657,7 +1658,7 @@ def render_job_card(job: pd.Series) -> str:
     # Escape text content for HTML
     reference = str(job["Reference"] or "No Ref").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
     project = str(job["ProjectName"] or "").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
-    company = str(job["Company"] or "").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
+    contact_first = str(job["ContactFirstName"] or "").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
 
     # Get the Sales Order ID for the link
     order_id = job["Id"]
@@ -1668,7 +1669,7 @@ def render_job_card(job: pd.Series) -> str:
     card_html += f'<div class="job-card {card_class}">'
     card_html += f'<div class="job-reference" title="{reference}">{reference}</div>'
     card_html += f'<div class="job-project" title="{project}">{project if project else "—"}</div>'
-    card_html += f'<div class="job-company" title="{company}">{company if company else "—"}</div>'
+    card_html += f'<div class="job-company" title="{contact_first}">{contact_first if contact_first else "—"}</div>'
     card_html += f'<div class="job-meta">{status_badge}{kp_badge}{stage_badge}</div>'
     card_html += '<div class="job-dates">'
     if due_date_str:
@@ -1993,7 +1994,7 @@ def render_tv_job_card(job: pd.Series) -> str:
     # Escape ALL text content properly using html.escape
     reference = html.escape(str(job["Reference"] or "No Ref"))
     project = html.escape(str(job["ProjectName"] or ""))
-    company = html.escape(str(job["Company"] or ""))
+    contact_first = html.escape(str(job["ContactFirstName"] or ""))
 
     # Kickplate count
     qty = int(job["QtyTotal"]) if job["QtyTotal"] else 0
@@ -2003,7 +2004,7 @@ def render_tv_job_card(job: pd.Series) -> str:
     card_html = '<div class="tv-job-card ' + card_class + '">'
     card_html += '<div class="tv-job-reference">' + reference + (' &nbsp;<span style="background:#11222c;color:white;padding:0.1rem 0.4rem;border-radius:4px;font-size:0.8rem;">' + kp_str + '</span>' if kp_str else '') + '</div>'
     card_html += '<div class="tv-job-project">' + (project if project else "—") + '</div>'
-    card_html += '<div class="tv-job-company">' + (company if company else "—") + '</div>'
+    card_html += '<div class="tv-job-company">' + (contact_first if contact_first else "—") + '</div>'
     card_html += '<div class="tv-job-date ' + date_class + '">' + due_date_str + '</div>'
     card_html += '</div>'
 
