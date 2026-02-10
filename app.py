@@ -92,7 +92,7 @@ CIN7_CUSTOMER_APPS_LINK = "767392"  # Your Cin7 customer apps link ID
 # Fields to request from Sales Orders
 # Note: DistributionBranchId/DistributionBranch kept for reference but no longer used for filtering
 SALES_ORDER_FIELDS = [
-    "Id", "Reference", "ProjectName", "Company", "ContactFirstName",
+    "Id", "Reference", "ProjectName", "Company", "FirstName",
     "CreatedDate", "ModifiedDate",
     "Stage", "Status", "BranchId",
     "EstimatedDeliveryDate", "DispatchedDate",
@@ -111,17 +111,18 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Hide sidebar completely
-st.markdown("""
-<style>
-    [data-testid="stSidebar"] {
-        display: none;
-    }
-    [data-testid="stSidebarCollapsedControl"] {
-        display: none;
-    }
-</style>
-""", unsafe_allow_html=True)
+# Hide sidebar completely (disabled when DEBUG_MODE is on)
+if not DEBUG_MODE:
+    st.markdown("""
+    <style>
+        [data-testid="stSidebar"] {
+            display: none;
+        }
+        [data-testid="stSidebarCollapsedControl"] {
+            display: none;
+        }
+    </style>
+    """, unsafe_allow_html=True)
 
 # Apply Hardware Direct theme
 apply_hd_theme()
@@ -1481,7 +1482,7 @@ def process_orders_dataframe(orders: List[Dict]) -> pd.DataFrame:
             "Reference": get_field("Reference") or "",
             "ProjectName": get_field("ProjectName") or "",
             "Company": get_field("Company") or "",
-            "ContactFirstName": get_field("ContactFirstName") or "",
+            "FirstName": get_field("FirstName") or "",
             "CreatedDate": created_date,
             "ModifiedDate": modified_date,
             "Stage": stage,
@@ -1658,7 +1659,7 @@ def render_job_card(job: pd.Series) -> str:
     # Escape text content for HTML
     reference = str(job["Reference"] or "No Ref").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
     project = str(job["ProjectName"] or "").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
-    contact_first = str(job["ContactFirstName"] or "").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
+    contact_first = str(job["FirstName"] or "").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
 
     # Get the Sales Order ID for the link
     order_id = job["Id"]
@@ -1994,7 +1995,7 @@ def render_tv_job_card(job: pd.Series) -> str:
     # Escape ALL text content properly using html.escape
     reference = html.escape(str(job["Reference"] or "No Ref"))
     project = html.escape(str(job["ProjectName"] or ""))
-    contact_first = html.escape(str(job["ContactFirstName"] or ""))
+    contact_first = html.escape(str(job["FirstName"] or ""))
 
     # Kickplate count
     qty = int(job["QtyTotal"]) if job["QtyTotal"] else 0
